@@ -52,7 +52,6 @@ public interface ITransactionService {
      */
     Result queryTxnList(int pageSize, int pageNumber);
 
-
     /**
      *  query asset balance and transactions
      *
@@ -69,7 +68,6 @@ public interface ITransactionService {
      */
     Result queryAddressInfo(String address, int pageNumber, int pageSize, String assetName);
 
-
     /**
      *  query the specially asset balance and transactions
      *
@@ -77,7 +75,6 @@ public interface ITransactionService {
      * @return
      */
     Result queryAddressInfoByTimeAndPage(String address, String assetName, int pageSize, int time);
-
 
     /**
      *  query the specially asset balance and transactions
@@ -95,22 +92,11 @@ public interface ITransactionService {
      */
     Result queryAddressInfoByTime(String address, String assetName, int beginTime);
 
-
     /**
      * 查询地址余额
      * @param address
      * @return
      */
     Result queryAddressBalance(String address);
-
-
-
-    /**
-     * 查询地址列表
-     * @return
-     */
-    Result queryAddressList();
-
-
 
 }

@@ -21,10 +21,10 @@ package com.github.ontio.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.ontio.dao.CurrentMapper;
+import com.github.ontio.dao.DailyMapper;
 import com.github.ontio.dao.Oep4Mapper;
 import com.github.ontio.dao.TransactionDetailMapper;
 import com.github.ontio.model.Oep4;
-import com.github.ontio.model.Oep4Key;
 import com.github.ontio.paramBean.Result;
 import com.github.ontio.service.ICurrentService;
 import com.github.ontio.utils.ConfigParam;
@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,6 +63,8 @@ public class CurrentServiceImpl implements ICurrentService {
     @Autowired
     private Oep4Mapper oep4Mapper;
     @Autowired
+    private DailyMapper dailyMapper;
+    @Autowired
     private ConfigParam configParam;
 
     private OntologySDKService sdk;
@@ -78,12 +81,12 @@ public class CurrentServiceImpl implements ICurrentService {
         Map summary = currentMapper.selectSummaryInfo();
        // List<String> addrList = transactionDetailMapper.selectAllAddress();
 
-        initSDK();
-        int nodeCount = sdk.getNodeCount();
+        //initSDK();
+        //int nodeCount = sdk.getNodeCount();
 
         Map<String, Object> rs = new HashMap();
 
-        rs.put("NodeCount", nodeCount);
+        rs.put("NodeCount", 33);
         rs.put("CurrentHeight", summary.get("Height"));
         rs.put("TxnCount", summary.get("TxnCount"));
         rs.put("OntIdCount", summary.get("OntIdCount"));
@@ -104,14 +107,14 @@ public class CurrentServiceImpl implements ICurrentService {
 
         JSONObject oep4Info = sdk.queryOep4Info(codeHash);
 
-        Oep4Key oep4KeyDAO = new Oep4Key();
+        Oep4 oep4KeyDAO = new Oep4();
         oep4KeyDAO.setContract(codeHash);
         oep4KeyDAO.setName(oep4Info.getString("Name"));
 
         Oep4 oep4DAO = oep4Mapper.selectByPrimaryKey(oep4KeyDAO);
 
-        if(!Helper.isEmptyOrNull(oep4DAO)) {
-            return Helper.result("RegisterOep4", ErrorInfo.ALREADY_EXIST.code(), ErrorInfo.ALREADY_EXIST.desc(), "", false);
+        if (!Helper.isEmptyOrNull(oep4DAO)) {
+            return Helper.result("RegisterOep4", ErrorInfo.ALREADY_EXIST.code(), ErrorInfo.ALREADY_EXIST.desc(), VERSION, false);
         }
 
         oep4DAO = new Oep4();
@@ -126,9 +129,40 @@ public class CurrentServiceImpl implements ICurrentService {
         oep4DAO.setContactinfo("");
         oep4Mapper.insertSelective(oep4DAO);
 
-        return Helper.result("RegisterOep4", ErrorInfo.SUCCESS.code(), ErrorInfo.SUCCESS.desc(), "", true);
+        return Helper.result("RegisterOep4", ErrorInfo.SUCCESS.code(), ErrorInfo.SUCCESS.desc(), VERSION, true);
+
+    }
+
+    @Override
+    public Result queryDailyInfo(long startTime, long endTime) {
+
+        long time = startTime - 24 * 60 * 60;
+
+        List<Map> dailyList = dailyMapper.selectDailyInfo(time, endTime);
+
+        if (dailyList.size() >= 2) {
+            for (int i = 1; i < dailyList.size(); i++) {
+                Map map = dailyList.get(i);
+                int addrCount = (int) dailyList.get(i).get("AddressCount") - (int) dailyList.get(i - 1).get("AddressCount");
+                map.put("AddressCount", addrCount);
+            }
+            dailyList.remove(0);
+        }
+
+        return Helper.result("QueryDailyInfo", ErrorInfo.SUCCESS.code(), ErrorInfo.SUCCESS.desc(), VERSION, dailyList);
+    }
 
 
+    @Override
+    public Result queryMarketingInfo() {
 
+        Map summary = currentMapper.selectSummaryInfo();
+        int height = (Integer) summary.get("Height");
+
+        Map<String, Object> rsMap = new HashMap<>();
+        rsMap.put("CurrentHeight", height);
+        rsMap.put("CurrentSupply", "59.75%");
+
+        return Helper.result("QueryMarketingInfo", ErrorInfo.SUCCESS.code(), ErrorInfo.SUCCESS.desc(), VERSION, rsMap);
     }
 }

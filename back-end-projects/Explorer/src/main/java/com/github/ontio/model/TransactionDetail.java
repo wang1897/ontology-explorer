@@ -2,7 +2,7 @@ package com.github.ontio.model;
 
 import java.math.BigDecimal;
 
-public class TransactionDetail extends TransactionDetailKey {
+public class TransactionDetail{
     private Integer txntype;
 
     private Integer txntime;
@@ -26,6 +26,28 @@ public class TransactionDetail extends TransactionDetailKey {
     private Integer confirmflag;
 
     private Integer eventtype;
+
+    private String contracthash;
+
+    private String txnhash;
+
+    private Integer txnindex;
+
+    public String getTxnhash() {
+        return txnhash;
+    }
+
+    public void setTxnhash(String txnhash) {
+        this.txnhash = txnhash == null ? null : txnhash.trim();
+    }
+
+    public Integer getTxnindex() {
+        return txnindex;
+    }
+
+    public void setTxnindex(Integer txnindex) {
+        this.txnindex = txnindex;
+    }
 
     public Integer getTxntype() {
         return txntype;
@@ -121,5 +143,13 @@ public class TransactionDetail extends TransactionDetailKey {
 
     public void setEventtype(Integer eventtype) {
         this.eventtype = eventtype;
+    }
+
+    public String getContracthash() {
+        return contracthash;
+    }
+
+    public void setContracthash(String contracthash) {
+        this.contracthash = contracthash;
     }
 }

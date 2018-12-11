@@ -41,4 +41,10 @@ public interface ICurrentService {
 
     Result registerOep4Info(JSONObject reqObj);
 
+
+    Result queryDailyInfo(long startTime, long endTime);
+
+
+    Result queryMarketingInfo();
+
 }

@@ -107,7 +107,6 @@ public class TransactionServiceImpl implements ITransactionService {
         return Helper.result("QueryTransaction", ErrorInfo.SUCCESS.code(), ErrorInfo.SUCCESS.desc(), VERSION, rs);
     }
 
-
     @Override
     public Result queryTxnDetailByHash(String txnHash) {
 
@@ -156,7 +155,6 @@ public class TransactionServiceImpl implements ITransactionService {
 
         return Helper.result("QueryTransaction", ErrorInfo.SUCCESS.code(), ErrorInfo.SUCCESS.desc(), VERSION, txnInfo);
     }
-
 
     @Override
     public Result queryAddressInfo(String address, int pageNumber, int pageSize) {
@@ -267,7 +265,6 @@ public class TransactionServiceImpl implements ITransactionService {
         return returnTxnList;
     }
 
-
     @Override
     public Result queryAddressInfo(String address, int pageNumber, int pageSize, String assetName) {
 
@@ -336,11 +333,18 @@ public class TransactionServiceImpl implements ITransactionService {
 
         Map<String, Object> parmMap = new HashMap<>();
         parmMap.put("Address", address);
-        parmMap.put("AssetName", assetName);
         parmMap.put("EndTime", endTime);
         parmMap.put("PageSize", pageSize);
 
-        List<Map> dbTxnList = transactionDetailMapper.selectTxnByAddressInfoAndTimePage(parmMap);
+        List<Map> dbTxnList = new ArrayList<>();
+
+        if ("dragon".equals(assetName)) {
+            parmMap.put("AssetName", assetName+ "%");
+            dbTxnList = transactionDetailMapper.selectTxnByAddressInfoAndTimePageDragon(parmMap);
+        } else {
+            parmMap.put("AssetName", assetName);
+            dbTxnList = transactionDetailMapper.selectTxnByAddressInfoAndTimePage(parmMap);
+        }
 
         //格式化转账交易列表
         List<Map> rsList = formatTransferTxnList(dbTxnList);
@@ -356,7 +360,6 @@ public class TransactionServiceImpl implements ITransactionService {
 
     }
 
-
     @Override
     public Result queryAddressInfoByTime(String address, String assetName, int beginTime, int endTime) {
 
@@ -366,7 +369,16 @@ public class TransactionServiceImpl implements ITransactionService {
         parmMap.put("BeginTime", beginTime);
         parmMap.put("EndTime", endTime);
 
-        List<Map> dbTxnList = transactionDetailMapper.selectTxnByAddressInfoAndTime(parmMap);
+
+        List<Map> dbTxnList = new ArrayList<>();
+        if ("dragon".equals(assetName)) {
+            parmMap.put("AssetName", assetName+ "%");
+            dbTxnList = transactionDetailMapper.selectTxnByAddressInfoAndTimeDragon(parmMap);
+        } else {
+            parmMap.put("AssetName", assetName);
+            dbTxnList = transactionDetailMapper.selectTxnByAddressInfoAndTime(parmMap);
+        }
+
 
         //格式化转账交易列表
         List<Map> rsList = formatTransferTxnList(dbTxnList);
@@ -380,7 +392,6 @@ public class TransactionServiceImpl implements ITransactionService {
         return Helper.result("QueryAddressInfo", ErrorInfo.SUCCESS.code(), ErrorInfo.SUCCESS.desc(), VERSION, rs);
 
     }
-
 
     @Override
     public Result queryAddressInfoByTime(String address, String assetName, int beginTime) {
@@ -405,25 +416,11 @@ public class TransactionServiceImpl implements ITransactionService {
 
     }
 
-
     @Override
     public Result queryAddressBalance(String address) {
 
         List balanceList = getAddressBalance(address, "");
         return Helper.result("QueryAddressBalance", ErrorInfo.SUCCESS.code(), ErrorInfo.SUCCESS.desc(), VERSION, balanceList);
-    }
-
-
-    @Override
-    public Result queryAddressList() {
-
-        List<String> addrList = transactionDetailMapper.selectAllAddress();
-
-        Map<String, Object> rsMap = new HashMap<>();
-        rsMap.put("Total", addrList.size());
-        rsMap.put("AddrList", addrList);
-
-        return Helper.result("QueryAllAddress", ErrorInfo.SUCCESS.code(), ErrorInfo.SUCCESS.desc(), VERSION, rsMap);
     }
 
 
@@ -493,7 +490,7 @@ public class TransactionServiceImpl implements ITransactionService {
 
             Map<String, Object> oep4Map = new HashMap<>();
             oep4Map.put("AssetName", symbol);
-            oep4Map.put("Balance", new BigDecimal(sdk.getAddressOep4Balance(address, contract)).divide(new BigDecimal(Math.pow(10, ((BigDecimal)map.get("Decimals")).intValue()))));
+            oep4Map.put("Balance", new BigDecimal(sdk.getAddressOep4Balance(address, contract)).divide(new BigDecimal(Math.pow(10, ((BigDecimal) map.get("Decimals")).intValue()))).toPlainString());
             balanceList.add(oep4Map);
         }
 

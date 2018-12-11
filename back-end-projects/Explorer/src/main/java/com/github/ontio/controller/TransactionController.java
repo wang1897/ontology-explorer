@@ -45,7 +45,6 @@ public class TransactionController {
     @Autowired
     private TransactionServiceImpl transactionService;
 
-
     /**
      * query the last few transactions
      *
@@ -61,7 +60,6 @@ public class TransactionController {
         Result rs = transactionService.queryTxnList(amount);
         return rs;
     }
-
 
     /**
      * query transactions by page
@@ -96,7 +94,6 @@ public class TransactionController {
         return rs;
     }
 
-
     /**
      * query asset balance and transactions by address
      *
@@ -114,7 +111,6 @@ public class TransactionController {
         Result rs = transactionService.queryAddressInfo(address, pageNumber, pageSize);
         return rs;
     }
-
 
     /**
      * query the specially asset balance and transactions
@@ -135,9 +131,9 @@ public class TransactionController {
         return rs;
     }
 
-
     /**
      * query the specially asset balance and transactions
+     * ONTO use
      *
      * @return
      */
@@ -155,11 +151,9 @@ public class TransactionController {
         return rs;
     }
 
-
-
     /**
      * query the specially asset balance and transactions
-     *
+     * ONTO use
      * @return
      */
     @RequestMapping(value = "/address/time/{address}/{assetname}/{begintime}/{endtime}", method = RequestMethod.GET)
@@ -175,7 +169,6 @@ public class TransactionController {
         Result rs = transactionService.queryAddressInfoByTime(address, assetName, beginTime, endTime);
         return rs;
     }
-
 
     /**
      * query the specially asset balance and transactions
@@ -195,9 +188,8 @@ public class TransactionController {
         return rs;
     }
 
-
     /**
-     * query the last few transactions
+     * query the balance
      *
      * @return
      */
@@ -211,7 +203,6 @@ public class TransactionController {
         Result rs = transactionService.queryAddressBalance(address);
         return rs;
     }
-
 
     /**
      * query all address information
@@ -227,7 +218,4 @@ public class TransactionController {
         Result rs = transactionService.queryAddressList();
         return rs;
     }*/
-
-
-
 }
